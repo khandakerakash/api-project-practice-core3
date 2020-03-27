@@ -15,6 +15,8 @@ namespace DLL.Repository
         Task CreateAsync(Student student);
         Task UpdateAsync(Student student);
         Task DeleteAsync(Student student);
+        Task<Student> IsEmailExistsAsync(string email);
+        Task<Student> IsRollNoExistsAsync(string rollNo);
         void Dispose();
     }
 
@@ -54,7 +56,17 @@ namespace DLL.Repository
             _context.Remove(student);
             await _context.SaveChangesAsync();
         }
-        
+
+        public async Task<Student> IsEmailExistsAsync(string email)
+        {
+            return await _context.Students.FirstOrDefaultAsync(x => x.Email == email);
+        }
+
+        public async Task<Student> IsRollNoExistsAsync(string rollNo)
+        {
+            return await _context.Students.FirstOrDefaultAsync(x => x.RollNo == rollNo);
+        }
+
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)

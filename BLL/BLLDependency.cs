@@ -12,10 +12,11 @@ namespace BLL
         {
             services.AddTransient<IStudentService, StudentService>();
             services.AddTransient<StudentCreateRequest, StudentCreateRequest>();
-            services.AddTransient<IValidator<DepartmentCreateRequest>, DepartmentCreateRequestValidator>();
-            
+            services.AddTransient<IValidator<StudentCreateRequest>, StudentCreateRequest.StudentCreateRequestRequestValidator>();
+
             services.AddTransient<IDepartmentService, DepartmentService>();
             services.AddTransient<DepartmentCreateRequest, DepartmentCreateRequest>();
+            services.AddTransient<IValidator<DepartmentCreateRequest>, DepartmentCreateRequestValidator>();
         }
     }
 }

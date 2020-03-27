@@ -15,6 +15,8 @@ namespace BLL.Service
         Task<ApiSuccessResponse> CreateAsync(StudentCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, StudentCreateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
+        Task<bool> IsEmailExistsAsync(string email);
+        Task<bool> IsRollNoExistsAsync(string rollNo);
     }
 
     public class StudentService : IStudentService
@@ -95,6 +97,18 @@ namespace BLL.Service
                 StatusCode = 200,
                 Message = "The student has been Successfully Deleted."
             };
+        }
+
+        public async Task<bool> IsEmailExistsAsync(string email)
+        {
+            var student = await _studentRepository.IsEmailExistsAsync(email);
+            return student == null;
+        }
+
+        public async Task<bool> IsRollNoExistsAsync(string rollNo)
+        {
+            var student = await _studentRepository.IsRollNoExistsAsync(rollNo);
+            return student == null;
         }
     }
 }
