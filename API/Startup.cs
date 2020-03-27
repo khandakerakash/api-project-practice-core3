@@ -57,9 +57,15 @@ namespace API
             // Register the Application Services
             //SetupBLLandDLLDependency(services,_env,Configuration);
             
+            // Student Services
             services.AddTransient<IStudentRepository, StudentRepository>();
             services.AddTransient<StudentCreateRequest, StudentCreateRequest>();
             services.AddTransient<IStudentService, StudentService>();
+            
+            // Department Services
+            services.AddTransient<IDepartmentRepository, DepartmentRepository>();
+            services.AddTransient<DepartmentCreateRequest, DepartmentCreateRequest>();
+            services.AddTransient<IDepartmentService, DepartmentService>();
         }
         
         // Setup BLL and DLL Services
