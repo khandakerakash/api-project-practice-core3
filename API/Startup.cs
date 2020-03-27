@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using BLL;
 using BLL.Request;
 using BLL.Service;
+using DLL;
 using DLL.DbContext;
 using DLL.Repository;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -22,10 +24,8 @@ namespace API
 {
     public class Startup
     {
-        //private readonly IWebHostEnvironment _env;
         public Startup(IConfiguration configuration)
         {
-            //_env = env;
             Configuration = configuration;
         }
 
@@ -34,7 +34,7 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation();
             
             // Register the Api Versioning
             services.AddApiVersioning(
@@ -54,8 +54,8 @@ namespace API
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("PracticeApiConnection")));
             
-            // Register the Application Services
-            //SetupBLLandDLLDependency(services,_env,Configuration);
+            // Register the ALL Services
+            SetupAllDependency(services);
             
             // Student Services
             services.AddTransient<IStudentRepository, StudentRepository>();
@@ -67,13 +67,14 @@ namespace API
             services.AddTransient<DepartmentCreateRequest, DepartmentCreateRequest>();
             services.AddTransient<IDepartmentService, DepartmentService>();
         }
-        
-        // Setup BLL and DLL Services
-        // private static void SetupBLLandDLLDependency(IServiceCollection services, IWebHostEnvironment env,IConfiguration configuration)
-        // {
-        //     BLLDependency.RegisterServices(services,configuration);
-        // }
 
+        // Setup BLL and DLL Services
+        private static void SetupAllDependency(IServiceCollection services)
+        {
+            DLLDependency.RegisterDLLServices(services);
+            BLLDependency.RegisterBLLServices(services);
+        }
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

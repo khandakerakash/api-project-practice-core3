@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
@@ -44,16 +45,11 @@ namespace BLL.Service
             };
 
             await _departmentRepository.CreateAsync(department);
-            if (await _departmentRepository.SaveChangesAsync() > 0)
+            return new ApiSuccessResponse()
             {
-                return new ApiSuccessResponse()
-                {
-                    StatusCode = 200,
-                    Message = "Department has been created successfully."
-                };
-            }
-
-            return null;
+                StatusCode = 200,
+                Message = "Department has been created successfully."
+            };
         }
 
         public async Task UpdateAsync(Department department)

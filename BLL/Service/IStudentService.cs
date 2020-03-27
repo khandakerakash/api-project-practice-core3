@@ -13,8 +13,8 @@ namespace BLL.Service
         Task<IEnumerable<Student>> FindAllAsync();
         Task<Student> FindOneAsync(long id);
         Task<ApiSuccessResponse> CreateAsync(StudentCreateRequest request);
-        Task UpdateAsync(Student student);
-        Task DeleteAsync(long id);
+        Task<ApiSuccessResponse> UpdateAsync(long id, StudentCreateRequest request);
+        Task<ApiSuccessResponse> DeleteAsync(long id);
     }
 
     public class StudentService : IStudentService
@@ -45,26 +45,54 @@ namespace BLL.Service
             };
 
             await _studentRepository.CreateAsync(student);
-            if (await _studentRepository.SaveChangesAsync() > 0)
+            return new ApiSuccessResponse()
+            {
+                StatusCode = 200,
+                Message = "The Student has been Successfully Created."
+            };
+        }
+
+        public async Task<ApiSuccessResponse> UpdateAsync(long id, StudentCreateRequest request)
+        {
+            var student = await _studentRepository.FindOneAsync(id);
+            if (student == null)
             {
                 return new ApiSuccessResponse()
                 {
-                    StatusCode = 200,
-                    Message = "Student has been Successfully Created."
+                    StatusCode = 304,
+                    Message = "Something went wrong!"
+                };
+            }
+            
+            student.Name = request.Name;
+            student.Email = request.Email;
+            
+            await _studentRepository.UpdateAsync(student);
+            return new ApiSuccessResponse()
+            {
+                StatusCode = 200,
+                Message = "The Student has been Successfully Updated."
+            };
+        }
+
+        public async Task<ApiSuccessResponse> DeleteAsync(long id)
+        {
+            var student = await _studentRepository.FindOneAsync(id);
+            if (student == null)
+            {
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 404,
+                    Message = "The student is not found with this given id!"
                 };
             }
 
-            return null;
-        }
-
-        public async Task UpdateAsync(Student student)
-        {
-            await _studentRepository.UpdateAsync(student);
-        }
-
-        public async Task DeleteAsync(long id)
-        {
-            await _studentRepository.DeleteAsync(id);
+            await _studentRepository.DeleteAsync(student);
+            return new ApiSuccessResponse()
+            {
+                StatusCode = 200,
+                Message = "The student has been Successfully Deleted."
+            };
         }
     }
 }

@@ -15,7 +15,6 @@ namespace DLL.Repository
         Task CreateAsync(Department department);
         Task UpdateAsync(Department department);
         Task DeleteAsync(long id);
-        Task<int> SaveChangesAsync();
         void Dispose();
     }
 
@@ -67,27 +66,6 @@ namespace DLL.Repository
             }
         }
         
-        public async Task<int> SaveChangesAsync()
-        {
-            var complete = await _context.SaveChangesAsync();
-
-            await RemoveTrackedEntries();
-
-            return complete;
-        }
-        
-        private async Task RemoveTrackedEntries()
-        {
-            var changedEntriesCopy = _context.ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Added ||
-                            e.State == EntityState.Modified ||
-                            e.State == EntityState.Deleted)
-                .ToList();
-
-            foreach (var entry in changedEntriesCopy)
-                entry.State = EntityState.Detached;
-        }
-
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)

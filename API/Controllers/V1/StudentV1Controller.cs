@@ -36,15 +36,15 @@ namespace API.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Student.Update)]
-        public IActionResult Update()
+        public async Task<IActionResult> Update(long id, StudentCreateRequest request)
         {
-            return Ok("Done");
+            return Ok(await _studentService.UpdateAsync(id, request));
         }
 
         [HttpDelete(ApiRoutes.Student.Delete)]
-        public IActionResult Delete()
+        public async Task<IActionResult> Delete(long id)
         {
-            return Ok("Done");
+            return Ok(await _studentService.DeleteAsync(id));
         }
     }
 }
