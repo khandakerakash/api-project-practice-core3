@@ -41,7 +41,8 @@ namespace BLL.Service
             var student = new Student()
             {
                 Name = request.Name,
-                Email = request.Email
+                Email = request.Email,
+                RollNo = request.RollNo
             };
 
             await _studentRepository.CreateAsync(student);
@@ -66,6 +67,7 @@ namespace BLL.Service
             
             student.Name = request.Name;
             student.Email = request.Email;
+            student.RollNo = request.RollNo;
             
             await _studentRepository.UpdateAsync(student);
             return new ApiSuccessResponse()
