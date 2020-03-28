@@ -14,7 +14,9 @@ namespace DLL.Repository
         Task<Department> FindOneAsync(long id);
         Task CreateAsync(Department department);
         Task UpdateAsync(Department department);
-        Task DeleteAsync(long id);
+        Task DeleteAsync(Department department);
+        Task<Department> IsNameExistsAsync(string name);
+        Task<Department> IsCodeExistsAsync(string code);
         void Dispose();
     }
 
@@ -45,27 +47,26 @@ namespace DLL.Repository
 
         public async Task UpdateAsync(Department department)
         {
-            var departmentToUpdate =
-                await _context.Departments.FirstOrDefaultAsync(x => x.DepartmentId == department.DepartmentId);
-            
-            if (departmentToUpdate != null)
-            {
-                departmentToUpdate.Name = department.Name;
-                departmentToUpdate.Code = department.Code;
-                await _context.SaveChangesAsync();
-            }
+            _context.Update(department);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(long id)
+        public async Task DeleteAsync(Department department)
         {
-            var departmentToDelete = await _context.Departments.FirstOrDefaultAsync(x => x.DepartmentId == id);
-            if (departmentToDelete != null)
-            {
-                _context.Remove(departmentToDelete);
-                await _context.SaveChangesAsync();
-            }
+            _context.Remove(department);
+            await _context.SaveChangesAsync();
         }
-        
+
+        public async Task<Department> IsNameExistsAsync(string name)
+        {
+            return await _context.Departments.FirstOrDefaultAsync(x => x.Name == name);
+        }
+
+        public async Task<Department> IsCodeExistsAsync(string code)
+        {
+            return await _context.Departments.FirstOrDefaultAsync(x => x.Code == code);
+        }
+
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)

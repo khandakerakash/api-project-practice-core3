@@ -56,23 +56,13 @@ namespace API
             
             // Register the ALL Services
             SetupAllDependency(services);
-            
-            // Student Services
-            services.AddTransient<IStudentRepository, StudentRepository>();
-            services.AddTransient<StudentCreateRequest, StudentCreateRequest>();
-            services.AddTransient<IStudentService, StudentService>();
-            
-            // Department Services
-            services.AddTransient<IDepartmentRepository, DepartmentRepository>();
-            services.AddTransient<DepartmentCreateRequest, DepartmentCreateRequest>();
-            services.AddTransient<IDepartmentService, DepartmentService>();
         }
 
         // Setup BLL and DLL Services
         private static void SetupAllDependency(IServiceCollection services)
         {
-            DLLDependency.RegisterDLLServices(services);
-            BLLDependency.RegisterBLLServices(services);
+            DllDependency.RegisterDllServices(services);
+            BllDependency.RegisterBllServices(services);
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

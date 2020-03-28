@@ -5,17 +5,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BLL
 {
-    public static class BLLDependency
+    public static class BllDependency
     {
-        public static void RegisterBLLServices(IServiceCollection services)
+        public static void RegisterBllServices(IServiceCollection services)
         {
             services.AddTransient<IStudentService, StudentService>();
             services.AddTransient<IValidator<StudentCreateRequest>, StudentCreateRequestValidator>();
             services.AddTransient<IValidator<StudentUpdateRequest>, StudentUpdateRequestValidator>();
 
             services.AddTransient<IDepartmentService, DepartmentService>();
-            services.AddTransient<DepartmentCreateRequest, DepartmentCreateRequest>();
             services.AddTransient<IValidator<DepartmentCreateRequest>, DepartmentCreateRequestValidator>();
+            services.AddTransient<IValidator<DepartmentUpdateRequest>, DepartmentUpdateRequestValidator>();
         }
     }
 }

@@ -21,31 +21,31 @@ namespace BLL.Request
 
             RuleFor(x => x.Name).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25);
             RuleFor(x => x.Email).NotNull().NotEmpty().MinimumLength(10).MaximumLength(25).EmailAddress()
-                .MustAsync(EmailIsExists).WithMessage("The student with given email already exists in our system.");
+                .MustAsync(EmailIsExists).WithMessage("The student with a given email already exists in our system.");
             RuleFor(x => x.RollNo).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25)
-                .MustAsync(RollNoIsExists).WithMessage("The student with given roll no already exists in our system");
+                .MustAsync(RollNoIsExists).WithMessage("The student with a given roll no already exists in our system");
 
             // When(x => x.Email != null, () =>
             // {
             //     RuleFor(x => x.Email).NotNull().NotEmpty().MinimumLength(10).MaximumLength(25).EmailAddress()
-            //         .MustAsync(EmailIsExists).WithMessage("The student with given email already exists in our system.");
+            //         .MustAsync(EmailIsExists).WithMessage("The student with a given email already exists in our system.");
             // });
             // When(x => x.RollNo != null, () =>
             // {
             //     RuleFor(x => x.RollNo).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25)
-            //         .MustAsync(RollNoIsExists).WithMessage("The student with given roll no already exists in our system");
+            //         .MustAsync(RollNoIsExists).WithMessage("The student with a given roll no already exists in our system");
             // });
 
             // When(x => string.IsNullOrEmpty(x.Email), () =>
             // {
             //     RuleFor(x => x.Email).NotNull().NotEmpty().MinimumLength(10).MaximumLength(25).EmailAddress()
-            //         .MustAsync(EmailIsExists).WithMessage("The student with given email already exists in our system.");
+            //         .MustAsync(EmailIsExists).WithMessage("The student with a given email already exists in our system.");
             // });
             //
             // When(x => string.IsNullOrEmpty(x.RollNo), () =>
             // {
             //     RuleFor(x => x.RollNo).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25)
-            //         .MustAsync(RollNoIsExists).WithMessage("The student with given roll no already exists in our system");
+            //         .MustAsync(RollNoIsExists).WithMessage("The student with a given roll no already exists in our system");
             // });
         }
         

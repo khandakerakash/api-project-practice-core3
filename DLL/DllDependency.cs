@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DLL
 {
-    public static class DLLDependency
+    public static class DllDependency
     {
-        public static void RegisterDLLServices(IServiceCollection services)
+        public static void RegisterDllServices(IServiceCollection services)
         {
             services.AddTransient<IStudentRepository, StudentRepository>();
             services.AddTransient<IDepartmentRepository, DepartmentRepository>();

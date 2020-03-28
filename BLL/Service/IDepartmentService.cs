@@ -13,8 +13,10 @@ namespace BLL.Service
         Task<IEnumerable<Department>> FindAllAsync();
         Task<Department> FindOneAsync(long id);
         Task<ApiSuccessResponse> CreateAsync(DepartmentCreateRequest request);
-        Task UpdateAsync(Department department);
-        Task DeleteAsync(long id);
+        Task<ApiSuccessResponse> UpdateAsync(long id, DepartmentUpdateRequest request);
+        Task<ApiSuccessResponse> DeleteAsync(long id);
+        Task<bool> IsNameExistsAsync(string name);
+        Task<bool> IsCodeExistsAsync(string code);
     }
 
     public class DepartmentService : IDepartmentService
@@ -52,14 +54,61 @@ namespace BLL.Service
             };
         }
 
-        public async Task UpdateAsync(Department department)
+        public async Task<ApiSuccessResponse> UpdateAsync(long id, DepartmentUpdateRequest request)
         {
-            throw new System.NotImplementedException();
+            var department = await _departmentRepository.FindOneAsync(id);
+
+            if (department == null)
+            {
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 304,
+                    Message = "Something went wrong!" 
+                };
+            }
+
+            department.Name = request.Name;
+            department.Code = request.Code;
+            
+            await _departmentRepository.UpdateAsync(department);
+            return new ApiSuccessResponse()
+            {
+                StatusCode = 200,
+                Message = "The Department has been Successfully Updated."
+            };
         }
 
-        public async Task DeleteAsync(long id)
+        public async Task<ApiSuccessResponse> DeleteAsync(long id)
         {
-            throw new System.NotImplementedException();
+            var department = await _departmentRepository.FindOneAsync(id);
+
+            if (department == null)
+            {
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 404,
+                    Message = "The student is not found with this given id!"
+                };
+            }
+            
+            await _departmentRepository.DeleteAsync(department);
+            return new ApiSuccessResponse()
+            {
+                StatusCode = 200,
+                Message = "The department has been Successfully Deleted."
+            };
+        }
+
+        public async Task<bool> IsNameExistsAsync(string name)
+        {
+            var department = await _departmentRepository.IsNameExistsAsync(name);
+            return department == null;
+        }
+
+        public async Task<bool> IsCodeExistsAsync(string code)
+        {
+            var department = await _departmentRepository.IsCodeExistsAsync(code);
+            return department == null;
         }
     }
 }

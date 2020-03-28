@@ -36,15 +36,15 @@ namespace API.Controllers.V1
         }
         
         [HttpPut(ApiRoutes.Department.Update)]
-        public IActionResult Update()
+        public async Task<IActionResult> Update(long id, DepartmentUpdateRequest request)
         {
-            return Ok("Done");
+            return Ok(await _departmentService.UpdateAsync(id, request));
         }
 
         [HttpDelete(ApiRoutes.Department.Delete)]
-        public IActionResult Delete()
+        public async Task<IActionResult> Delete(long id)
         {
-            return Ok("Done");
+            return Ok(await _departmentService.DeleteAsync(id));
         }
     }
 }
