@@ -36,7 +36,7 @@ namespace API.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Student.Update)]
-        public async Task<IActionResult> Update(long id, StudentCreateRequest request)
+        public async Task<IActionResult> Update(long id, StudentUpdateRequest request)
         {
             return Ok(await _studentService.UpdateAsync(id, request));
         }

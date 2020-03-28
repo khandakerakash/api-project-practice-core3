@@ -13,7 +13,7 @@ namespace BLL.Service
         Task<IEnumerable<Student>> FindAllAsync();
         Task<Student> FindOneAsync(long id);
         Task<ApiSuccessResponse> CreateAsync(StudentCreateRequest request);
-        Task<ApiSuccessResponse> UpdateAsync(long id, StudentCreateRequest request);
+        Task<ApiSuccessResponse> UpdateAsync(long id, StudentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsRollNoExistsAsync(string rollNo);
@@ -55,7 +55,7 @@ namespace BLL.Service
             };
         }
 
-        public async Task<ApiSuccessResponse> UpdateAsync(long id, StudentCreateRequest request)
+        public async Task<ApiSuccessResponse> UpdateAsync(long id, StudentUpdateRequest request)
         {
             var student = await _studentRepository.FindOneAsync(id);
             if (student == null)
