@@ -88,7 +88,7 @@ namespace BLL.Service
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
-                    Message = "The Student has been Successfully Updated."
+                    Message = "The Student has been successfully updated."
                 };
             
             throw new MyAppException("Something went wrong!");
@@ -105,7 +105,7 @@ namespace BLL.Service
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
-                    Message = "The Student has been Successfully Updated."
+                    Message = "The Student has been successfully deleted."
                 };
             
             throw new MyAppException("Something went wrong!");
