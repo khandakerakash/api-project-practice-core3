@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Middleware;
 using BLL;
 using BLL.Request;
 using BLL.Service;
@@ -34,7 +35,9 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddFluentValidation();
+            services.AddControllers()
+                .AddNewtonsoftJson()
+                .AddFluentValidation();
             
             // Register the Api Versioning
             services.AddApiVersioning(
@@ -73,6 +76,10 @@ namespace API
                 app.UseDeveloperExceptionPage();
             }
             
+            // Start Custom Middleware
+            app.UseMiddleware<MyAppExceptionMiddleware>();
+            // End Custom Middleware
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 

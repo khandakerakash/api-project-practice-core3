@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
 using DLL.Model;
 using DLL.Repository;
+using Utility.Exceptions;
 
 namespace BLL.Service
 {
     public interface IDepartmentService
     {
         Task<IEnumerable<Department>> FindAllAsync();
-        Task<Department> FindOneAsync(long id);
+        Task<Department> FindSingleAsync(long id);
         Task<ApiSuccessResponse> CreateAsync(DepartmentCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, DepartmentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
@@ -33,9 +33,12 @@ namespace BLL.Service
             return await _departmentRepository.FindAllAsync();
         }
 
-        public async Task<Department> FindOneAsync(long id)
+        public async Task<Department> FindSingleAsync(long id)
         {
-            return await _departmentRepository.FindOneAsync(id);
+            var department = await _departmentRepository.FindSingleAsync(x=> x.DepartmentId == id);
+            if (department == null)
+                throw new MyAppException("The department not found!");
+            return department;
         }
 
         public async Task<ApiSuccessResponse> CreateAsync(DepartmentCreateRequest request)
@@ -47,68 +50,76 @@ namespace BLL.Service
             };
 
             await _departmentRepository.CreateAsync(department);
-            return new ApiSuccessResponse()
-            {
-                StatusCode = 200,
-                Message = "Department has been created successfully."
-            };
+
+            if (await _departmentRepository.SaveChangesAsync())
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 200,
+                    Message = "Department has been created successfully."
+                };
+            
+            throw new MyAppException("Something went wrong!");
         }
 
         public async Task<ApiSuccessResponse> UpdateAsync(long id, DepartmentUpdateRequest request)
         {
-            var department = await _departmentRepository.FindOneAsync(id);
-
+            var department = await _departmentRepository.FindSingleAsync(x => x.DepartmentId == id);
             if (department == null)
-            {
-                return new ApiSuccessResponse()
-                {
-                    StatusCode = 304,
-                    Message = "Something went wrong!" 
-                };
-            }
+                throw new MyAppException("The department not found!");
+            
+            var departmentNameAlreadyExists =
+                await _departmentRepository.FindSingleAsync(x => x.Name == request.Name && x.Name != department.Name);
+            if (departmentNameAlreadyExists != null)
+                throw new MyAppException("The department with a given name is already in our system!");
 
+            var departmentCodeAlreadyExists =
+                await _departmentRepository.FindSingleAsync(x => x.Code == request.Code && x.Code != department.Code);
+            if (departmentCodeAlreadyExists != null)
+                throw new MyAppException("The department with a given code is already in our system!");
+            
             department.Name = request.Name;
             department.Code = request.Code;
             
-            await _departmentRepository.UpdateAsync(department);
-            return new ApiSuccessResponse()
-            {
-                StatusCode = 200,
-                Message = "The Department has been Successfully Updated."
-            };
+            _departmentRepository.Update(department);
+            if (await _departmentRepository.SaveChangesAsync())
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 200,
+                    Message = "The department has been successfully updated."
+                };
+            
+            throw new MyAppException("Something went wrong!");
         }
 
         public async Task<ApiSuccessResponse> DeleteAsync(long id)
         {
-            var department = await _departmentRepository.FindOneAsync(id);
+            var department = await _departmentRepository.FindSingleAsync(x => x.DepartmentId == id);
 
             if (department == null)
-            {
+                throw new MyAppException("The department not found!");
+
+            
+            _departmentRepository.Delete(department);
+            if (await _departmentRepository.SaveChangesAsync())
                 return new ApiSuccessResponse()
                 {
-                    StatusCode = 404,
-                    Message = "The student is not found with this given id!"
+                    StatusCode = 200,
+                    Message = "The department has been successfully deleted."
                 };
-            }
             
-            await _departmentRepository.DeleteAsync(department);
-            return new ApiSuccessResponse()
-            {
-                StatusCode = 200,
-                Message = "The department has been Successfully Deleted."
-            };
+            throw new MyAppException("Something went wrong!");
         }
 
         public async Task<bool> IsNameExistsAsync(string name)
         {
-            var department = await _departmentRepository.IsNameExistsAsync(name);
-            return department == null;
+            var department = await _departmentRepository.FindSingleAsync(x => x.Name == name);
+            return department == null ? true : false;
         }
 
         public async Task<bool> IsCodeExistsAsync(string code)
         {
-            var department = await _departmentRepository.IsCodeExistsAsync(code);
-            return department == null;
+            var department = await _departmentRepository.FindSingleAsync(x => x.Code == code);
+            return department == null ? true : false;
         }
     }
 }

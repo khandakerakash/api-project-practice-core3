@@ -10,10 +10,15 @@ namespace BLL
         public static void RegisterBllServices(IServiceCollection services)
         {
             services.AddTransient<IStudentService, StudentService>();
+            services.AddTransient<IDepartmentService, DepartmentService>();
+            
+            AllValidationDependency(services);
+        }
+
+        private static void AllValidationDependency(IServiceCollection services)
+        {
             services.AddTransient<IValidator<StudentCreateRequest>, StudentCreateRequestValidator>();
             services.AddTransient<IValidator<StudentUpdateRequest>, StudentUpdateRequestValidator>();
-
-            services.AddTransient<IDepartmentService, DepartmentService>();
             services.AddTransient<IValidator<DepartmentCreateRequest>, DepartmentCreateRequestValidator>();
             services.AddTransient<IValidator<DepartmentUpdateRequest>, DepartmentUpdateRequestValidator>();
         }

@@ -2,16 +2,16 @@
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
-using DLL.DbContext;
 using DLL.Model;
 using DLL.Repository;
+using Utility.Exceptions;
 
 namespace BLL.Service
 {
     public interface IStudentService
     {
         Task<IEnumerable<Student>> FindAllAsync();
-        Task<Student> FindOneAsync(long id);
+        Task<Student> FindSingleAsync(long id);
         Task<ApiSuccessResponse> CreateAsync(StudentCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, StudentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
@@ -33,9 +33,12 @@ namespace BLL.Service
             return await _studentRepository.FindAllAsync();
         }
 
-        public async Task<Student> FindOneAsync(long id)
+        public async Task<Student> FindSingleAsync(long id)
         {
-            return await _studentRepository.FindOneAsync(id);
+            var student = await _studentRepository.FindSingleAsync(x => x.StudentId == id);
+            if (student == null)
+                throw new MyAppException("The student with a given id is not found!");
+            return student;
         }
 
         public async Task<ApiSuccessResponse> CreateAsync(StudentCreateRequest request)
@@ -48,67 +51,76 @@ namespace BLL.Service
             };
 
             await _studentRepository.CreateAsync(student);
-            return new ApiSuccessResponse()
+            if (await _studentRepository.SaveChangesAsync())
             {
-                StatusCode = 200,
-                Message = "The Student has been Successfully Created."
-            };
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 200,
+                    Message = "The Student has been Successfully Created."
+                };
+            }
+            
+            throw new MyAppException("Something went wrong!");
         }
 
         public async Task<ApiSuccessResponse> UpdateAsync(long id, StudentUpdateRequest request)
         {
-            var student = await _studentRepository.FindOneAsync(id);
+            var student = await _studentRepository.FindSingleAsync(x => x.StudentId == id);
             if (student == null)
-            {
-                return new ApiSuccessResponse()
-                {
-                    StatusCode = 304,
-                    Message = "Something went wrong!"
-                };
-            }
+                throw new MyAppException("The student with a given id is not found!");
+
+            var studentEmailAlreadyExists =
+                await _studentRepository.FindSingleAsync(x => x.Email == request.Email && x.Email != student.Email);
+            if (studentEmailAlreadyExists != null)
+                throw new MyAppException("The student with a given email already exists in our system!");
+
+            var studentRollNoAlreadyExists =
+                await _studentRepository.FindSingleAsync(x => x.RollNo == request.RollNo && x.Email != student.RollNo);
+            if (studentRollNoAlreadyExists != null)
+                throw new MyAppException("The student with a given roll no. already exists in our system!");
             
             student.Name = request.Name;
             student.Email = request.Email;
             student.RollNo = request.RollNo;
             
-            await _studentRepository.UpdateAsync(student);
-            return new ApiSuccessResponse()
-            {
-                StatusCode = 200,
-                Message = "The Student has been Successfully Updated."
-            };
+            _studentRepository.Update(student);
+            if (await _studentRepository.SaveChangesAsync())
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 200,
+                    Message = "The Student has been Successfully Updated."
+                };
+            
+            throw new MyAppException("Something went wrong!");
         }
 
         public async Task<ApiSuccessResponse> DeleteAsync(long id)
         {
-            var student = await _studentRepository.FindOneAsync(id);
+            var student = await _studentRepository.FindSingleAsync(x => x.StudentId == id);
             if (student == null)
-            {
+                throw new MyAppException("The student with a given id is not found!");
+
+            _studentRepository.Delete(student);
+            if (await _studentRepository.SaveChangesAsync())
                 return new ApiSuccessResponse()
                 {
-                    StatusCode = 404,
-                    Message = "The student is not found with this given id!"
+                    StatusCode = 200,
+                    Message = "The Student has been Successfully Updated."
                 };
-            }
-
-            await _studentRepository.DeleteAsync(student);
-            return new ApiSuccessResponse()
-            {
-                StatusCode = 200,
-                Message = "The student has been Successfully Deleted."
-            };
+            
+            throw new MyAppException("Something went wrong!");
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
         {
-            var student = await _studentRepository.IsEmailExistsAsync(email);
-            return student == null;
+            var student = await _studentRepository.FindSingleAsync(x => x.Email == email);
+            return student == null ? true : false;
         }
 
         public async Task<bool> IsRollNoExistsAsync(string rollNo)
         {
-            var student = await _studentRepository.IsRollNoExistsAsync(rollNo);
-            return student == null;
+            var student = await _studentRepository.FindSingleAsync(x => x.RollNo == rollNo);
+            return student == null ? true : false;
         }
     }
 }

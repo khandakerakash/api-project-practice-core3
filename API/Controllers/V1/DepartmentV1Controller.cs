@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using API.Utility;
+using Utility.Routes;
 using BLL.Request;
 using BLL.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +26,7 @@ namespace API.Controllers.V1
         [HttpGet(ApiRoutes.Department.GetOne)]
         public async Task<IActionResult> GetOne(long id)
         {
-            return Ok(await _departmentService.FindOneAsync(id));
+            return Ok(await _departmentService.FindSingleAsync(id));
         }
 
         [HttpPost(ApiRoutes.Department.Create)]

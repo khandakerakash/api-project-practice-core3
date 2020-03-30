@@ -1,6 +1,6 @@
-﻿namespace API.Utility
+﻿namespace Utility.Routes
 {
-    public static class ApiRoutes
+    public class ApiRoutes
     {
         private const string Base = "";
         

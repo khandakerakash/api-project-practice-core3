@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DLL\DLL.csproj" />
+      <ProjectReference Include="..\Utility\Utility.csproj" />
     </ItemGroup>
 
     <ItemGroup>
