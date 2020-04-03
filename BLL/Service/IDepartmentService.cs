@@ -4,6 +4,7 @@ using BLL.Request;
 using BLL.Response;
 using DLL.Model;
 using DLL.Repository;
+using DLL.UnitOfWorks;
 using Utility.Exceptions;
 
 namespace BLL.Service
@@ -21,21 +22,21 @@ namespace BLL.Service
 
     public class DepartmentService : IDepartmentService
     {
-        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DepartmentService(IDepartmentRepository departmentRepository)
+        public DepartmentService(IUnitOfWork unitOfWork)
         {
-            _departmentRepository = departmentRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Department>> FindAllAsync()
         {
-            return await _departmentRepository.FindAllAsync();
+            return await _unitOfWork.DepartmentRepository.FindAllAsync();
         }
 
         public async Task<Department> FindSingleAsync(long id)
         {
-            var department = await _departmentRepository.FindSingleAsync(x=> x.DepartmentId == id);
+            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x=> x.DepartmentId == id);
             if (department == null)
                 throw new MyAppException("The department not found!");
             return department;
@@ -49,9 +50,9 @@ namespace BLL.Service
                 Code = request.Code
             };
 
-            await _departmentRepository.CreateAsync(department);
+            await _unitOfWork.DepartmentRepository.CreateAsync(department);
 
-            if (await _departmentRepository.SaveChangesAsync())
+            if (await _unitOfWork.AppSaveChangesAsync())
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
@@ -63,25 +64,25 @@ namespace BLL.Service
 
         public async Task<ApiSuccessResponse> UpdateAsync(long id, DepartmentUpdateRequest request)
         {
-            var department = await _departmentRepository.FindSingleAsync(x => x.DepartmentId == id);
+            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.DepartmentId == id);
             if (department == null)
                 throw new MyAppException("The department not found!");
             
             var departmentNameAlreadyExists =
-                await _departmentRepository.FindSingleAsync(x => x.Name == request.Name && x.Name != department.Name);
+                await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.Name == request.Name && x.Name != department.Name);
             if (departmentNameAlreadyExists != null)
                 throw new MyAppException("The department with a given name is already in our system!");
 
             var departmentCodeAlreadyExists =
-                await _departmentRepository.FindSingleAsync(x => x.Code == request.Code && x.Code != department.Code);
+                await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.Code == request.Code && x.Code != department.Code);
             if (departmentCodeAlreadyExists != null)
                 throw new MyAppException("The department with a given code is already in our system!");
             
             department.Name = request.Name;
             department.Code = request.Code;
             
-            _departmentRepository.Update(department);
-            if (await _departmentRepository.SaveChangesAsync())
+            _unitOfWork.DepartmentRepository.Update(department);
+            if (await _unitOfWork.AppSaveChangesAsync())
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
@@ -93,14 +94,13 @@ namespace BLL.Service
 
         public async Task<ApiSuccessResponse> DeleteAsync(long id)
         {
-            var department = await _departmentRepository.FindSingleAsync(x => x.DepartmentId == id);
+            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.DepartmentId == id);
 
             if (department == null)
                 throw new MyAppException("The department not found!");
-
             
-            _departmentRepository.Delete(department);
-            if (await _departmentRepository.SaveChangesAsync())
+            _unitOfWork.DepartmentRepository.Delete(department);
+            if (await _unitOfWork.AppSaveChangesAsync())
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
@@ -112,13 +112,13 @@ namespace BLL.Service
 
         public async Task<bool> IsNameExistsAsync(string name)
         {
-            var department = await _departmentRepository.FindSingleAsync(x => x.Name == name);
+            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.Name == name);
             return department == null ? true : false;
         }
 
         public async Task<bool> IsCodeExistsAsync(string code)
         {
-            var department = await _departmentRepository.FindSingleAsync(x => x.Code == code);
+            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.Code == code);
             return department == null ? true : false;
         }
     }

@@ -16,7 +16,6 @@ namespace DLL.UnitOfWorks
         Task CreateAsync(T entity);
         Task<T> FindSingleAsync(Expression<Func<T, bool>> expression);
         Task<List<T>> FindAllAsync(Expression<Func<T, bool>> expression = null);
-        Task<bool> SaveChangesAsync();
     }
 
     public class RepositoryBase<T> : IRepositoryBase<T> where T : class
@@ -54,11 +53,6 @@ namespace DLL.UnitOfWorks
                 return await _context.Set<T>().ToListAsync();
 
             return await _context.Set<T>().ToListAsync();
-        }
-
-        public async Task<bool> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync() > 0 ? true : false;
         }
     }
 }
