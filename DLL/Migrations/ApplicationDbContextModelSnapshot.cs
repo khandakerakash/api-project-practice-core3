@@ -206,6 +206,9 @@ namespace DLL.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("DepartmentId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -225,6 +228,8 @@ namespace DLL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StudentId");
+
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Students");
                 });
@@ -326,6 +331,15 @@ namespace DLL.Migrations
                     b.HasOne("DLL.Model.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DLL.Model.Student", b =>
+                {
+                    b.HasOne("DLL.Model.Department", "Department")
+                        .WithMany("Students")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

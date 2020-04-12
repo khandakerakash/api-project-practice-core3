@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DLL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200409175532_IdentityModifiedMigration")]
-    partial class IdentityModifiedMigration
+    [Migration("20200412200607_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -208,6 +208,9 @@ namespace DLL.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("DepartmentId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -227,6 +230,8 @@ namespace DLL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StudentId");
+
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Students");
                 });
@@ -328,6 +333,15 @@ namespace DLL.Migrations
                     b.HasOne("DLL.Model.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DLL.Model.Student", b =>
+                {
+                    b.HasOne("DLL.Model.Department", "Department")
+                        .WithMany("Students")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

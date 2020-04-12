@@ -12,6 +12,7 @@ namespace BLL.Request
         public string Name { get; set; }
         public string Email { get; set; }
         public string RollNo { get; set; }
+        public long DepartmentId { get; set; }
     }
     
     public class StudentCreateRequestValidator : AbstractValidator<StudentCreateRequest> {
@@ -24,6 +25,7 @@ namespace BLL.Request
                 .MustAsync(EmailIsExists).WithMessage("The student with a given email already exists in our system.");
             RuleFor(x => x.RollNo).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25)
                 .MustAsync(RollNoIsExists).WithMessage("The student with a given roll no already exists in our system");
+            RuleFor(x => x.DepartmentId).NotNull().NotEmpty();
         }
         
         private async Task<bool> EmailIsExists(string email, CancellationToken token)

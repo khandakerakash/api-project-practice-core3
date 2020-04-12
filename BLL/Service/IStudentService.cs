@@ -49,9 +49,10 @@ namespace BLL.Service
             {
                 Name = request.Name,
                 Email = request.Email,
-                RollNo = request.RollNo
+                RollNo = request.RollNo,
+                DepartmentId = request.DepartmentId
             };
-
+            
             await _unitOfWork.StudentRepository.CreateAsync(student);
             if (await _unitOfWork.AppSaveChangesAsync())
             {
@@ -84,7 +85,8 @@ namespace BLL.Service
             student.Name = request.Name;
             student.Email = request.Email;
             student.RollNo = request.RollNo;
-            
+            student.DepartmentId = request.DepartmentId;
+
             _unitOfWork.StudentRepository.Update(student);
             if (await _unitOfWork.AppSaveChangesAsync())
                 return new ApiSuccessResponse()

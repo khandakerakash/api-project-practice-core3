@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DLL.Migrations
 {
-    public partial class IdentityModifiedMigration : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -75,26 +75,6 @@ namespace DLL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Departments", x => x.DepartmentId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Students",
-                columns: table => new
-                {
-                    StudentId = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    RollNo = table.Column<string>(nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(nullable: false),
-                    CreatedBy = table.Column<string>(nullable: true),
-                    UpdatedAt = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedBy = table.Column<string>(nullable: true),
-                    IsDeleted = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Students", x => x.StudentId);
                 });
 
             migrationBuilder.CreateTable(
@@ -203,6 +183,33 @@ namespace DLL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    StudentId = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    RollNo = table.Column<string>(nullable: true),
+                    DepartmentId = table.Column<long>(nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(nullable: false),
+                    CreatedBy = table.Column<string>(nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedBy = table.Column<string>(nullable: true),
+                    IsDeleted = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.StudentId);
+                    table.ForeignKey(
+                        name: "FK_Students_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -241,6 +248,11 @@ namespace DLL.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_DepartmentId",
+                table: "Students",
+                column: "DepartmentId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -261,9 +273,6 @@ namespace DLL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Departments");
-
-            migrationBuilder.DropTable(
                 name: "Students");
 
             migrationBuilder.DropTable(
@@ -271,6 +280,9 @@ namespace DLL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
         }
     }
 }

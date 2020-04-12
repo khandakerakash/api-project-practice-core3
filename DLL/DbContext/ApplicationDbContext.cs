@@ -42,6 +42,11 @@ namespace DLL.DbContext
                 }
             }
             base.OnModelCreating(modelBuilder);
+            
+            modelBuilder.Entity<Department>()
+                .HasMany(c => c.Students)
+                .WithOne(e => e.Department)
+                .IsRequired();
         }
         
         private const string IsDeletedProperty = "IsDeleted";
