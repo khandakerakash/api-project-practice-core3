@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using DLL.Model;
 using DLL.Model.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Utility.Helpers;
 
 namespace DLL.DbContext
 {
@@ -15,8 +18,11 @@ namespace DLL.DbContext
         IdentityUserClaim<long>, AppUserRole, IdentityUserLogin<long>,
         IdentityRoleClaim<long>, IdentityUserToken<long>>
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ApplicationDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) : base(options)
         {
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public DbSet<Student> Students { get; set; }
@@ -65,6 +71,7 @@ namespace DLL.DbContext
         private void OnBeforeSaving()
         {
             var entries = ChangeTracker.Entries();
+            var userName = GetCurrentUserName();
             foreach (var entry in entries)
             {
                 if (entry.Entity is ITrackable trackable)
@@ -75,10 +82,13 @@ namespace DLL.DbContext
                     {
                         case EntityState.Added:
                             trackable.CreatedAt = now;
+                            trackable.CreatedBy = userName;
                             trackable.UpdatedAt = now;
+                            trackable.UpdatedBy = userName;
                             break;
                         case EntityState.Modified:
                             trackable.UpdatedAt = now;
+                            trackable.UpdatedBy = userName;
                             break;
                         case EntityState.Deleted:
                             entry.Property(IsDeletedProperty).CurrentValue = true;
@@ -87,6 +97,15 @@ namespace DLL.DbContext
                     }
                 }
             }
+        }
+
+        private string GetCurrentUserName()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
+                return httpContext.User.Claims.Where(c => c.Type == CustomJwtClaimNames.UserName)
+                    .Select(c => c.Value).SingleOrDefault();
+            return null;
         }
     }
 }

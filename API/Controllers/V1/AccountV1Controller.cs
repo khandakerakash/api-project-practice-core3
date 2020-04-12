@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -31,10 +32,23 @@ namespace API.Controllers.V1
         }
         
         [HttpGet("test2")]
-        [Authorize]
+        [Authorize(Roles = "staff")]
         public IActionResult Test2()
         {
+            var cp = User;
+            
+            _accountService.Test(cp);
             return Ok("I'm from Test2");
+        }
+        
+        [HttpGet("test3")]
+        [Authorize(Roles = "teacher")]
+        public async Task<IActionResult> Test3()
+        {
+            var cp = User;
+            
+            await _accountService.Test(cp);
+            return Ok("I'm from Test3");
         }
     }
 }
