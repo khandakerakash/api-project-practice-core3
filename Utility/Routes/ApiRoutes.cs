@@ -3,6 +3,11 @@
     public class ApiRoutes
     {
         private const string Base = "";
+
+        public static class Account
+        {
+            public const string Login = Base + "login";
+        }
         
         public static class Student
         {

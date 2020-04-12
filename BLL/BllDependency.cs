@@ -9,9 +9,10 @@ namespace BLL
     {
         public static void RegisterBllServices(IServiceCollection services)
         {
+            services.AddTransient<ITestService, TestService>();
+            services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IStudentService, StudentService>();
             services.AddTransient<IDepartmentService, DepartmentService>();
-            services.AddTransient<ITestService, TestService>();
             
             AllValidationDependency(services);
         }

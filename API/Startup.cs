@@ -1,10 +1,12 @@
 using System;
+using System.Text;
 using BLL;
 using DLL;
 using DLL.DbContext;
 using API.Middleware;
 using DLL.Model;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace API
@@ -52,7 +55,7 @@ namespace API
                 options.UseSqlServer(Configuration.GetConnectionString("PracticeApiConnection")));
             
             // Register the Identity
-            services.AddIdentity<AppUser, AppRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<AppUser, AppRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
                 
             // Register the Identity Validation Rules
@@ -77,8 +80,34 @@ namespace API
                 options.User.RequireUniqueEmail = false;
             });
             
+            // Register the JWT (JSON Web Token)
+            JwtConfiguration(services);
+            
             // Register the ALL Services
             SetupAllDependency(services);
+        }
+
+        // Setup JWT (JSON Web Token)
+        private void JwtConfiguration(IServiceCollection services)
+        {
+            services.AddAuthentication(x =>  
+            {  
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;  
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;  
+            }) 
+            .AddJwtBearer(options =>  
+            {  
+                options.TokenValidationParameters = new TokenValidationParameters  
+                {  
+                    ValidateIssuer = true,  
+                    ValidateAudience = true,  
+                    ValidateLifetime = true,  
+                    ValidateIssuerSigningKey = true,  
+                    ValidIssuer = Configuration["Jwt:Issuer"],  
+                    ValidAudience = Configuration["Jwt:Issuer"],  
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))  
+                };  
+            });  
         }
 
         // Setup BLL and DLL Services
@@ -112,9 +141,9 @@ namespace API
             // End of the Swagger
 
             app.UseHttpsRedirection();
-
-            app.UseRouting();
+            
             app.UseAuthentication();
+            app.UseRouting();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
