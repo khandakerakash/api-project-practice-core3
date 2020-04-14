@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
@@ -16,6 +17,7 @@ namespace BLL.Service
         Task<ApiSuccessResponse> CreateAsync(StudentCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, StudentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
+        Task<Student> FindDepartmentWiseStudentAsync(long DepartmentId);
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsRollNoExistsAsync(string rollNo);
     }
@@ -113,6 +115,15 @@ namespace BLL.Service
                 };
             
             throw new MyAppException("Something went wrong!");
+        }
+
+        public async Task<Student> FindDepartmentWiseStudentAsync(long DepartmentId)
+        {
+            var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.DepartmentId == DepartmentId);
+            //var student = await _unitOfWork.StudentRepository.FindAllAsync(x => x.DepartmentId == DepartmentId);
+            if(student == null)
+                throw new MyAppException("The student with a given department id is not found!");
+            return student;
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
