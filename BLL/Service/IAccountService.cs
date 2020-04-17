@@ -11,6 +11,7 @@ using BLL.Response;
 using DLL.Model;
 using DLL.UnitOfWorks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -32,13 +33,15 @@ namespace BLL.Service
         private readonly IConfiguration _config;
         private readonly IUnitOfWork _unitOfWork;
         private readonly TaposRSA _taposRsa;
+        private readonly IDistributedCache _cache;
 
-        public AccountService(UserManager<AppUser> userManager, IConfiguration config, IUnitOfWork unitOfWork, TaposRSA taposRsa)
+        public AccountService(UserManager<AppUser> userManager, IConfiguration config, IUnitOfWork unitOfWork, TaposRSA taposRsa, IDistributedCache cache)
         {
             _userManager = userManager;
             _config = config;
             _unitOfWork = unitOfWork;
             _taposRsa = taposRsa;
+            _cache = cache;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -107,7 +110,24 @@ namespace BLL.Service
             response.Token = new JwtSecurityTokenHandler().WriteToken(token);
             response.Expired = times * 60;
             response.RefreshToken = rsaData;
+
+            await StoreTokenInfo(userInfo.Id, response.Token, response.RefreshToken);
             return response;
-        }  
+        }
+
+        private async Task StoreTokenInfo(long userId, string accessToken, string refreshToken)
+        {
+            var accessTokenOptions = new DistributedCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(_config.GetValue<int>("Jwt:AccessTokenLifeTime")));
+            
+            var refreshTokenOptions = new DistributedCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(_config.GetValue<int>("Jwt:RefreshTokenLifeTime")));
+            
+            var accessTokenKey = userId.ToString() + "_accesstoken";
+            var refreshTokenKey = userId.ToString() + "_refreshtoken";
+            
+            await _cache.SetStringAsync(accessTokenKey, accessToken, accessTokenOptions);
+            await _cache.SetStringAsync(refreshTokenKey, refreshToken, refreshTokenOptions);
+        }
     }
 }

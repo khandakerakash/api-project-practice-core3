@@ -4,9 +4,11 @@ using BLL;
 using DLL;
 using DLL.DbContext;
 using API.Middleware;
+using API.Policy;
 using DLL.Model;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -108,12 +110,18 @@ namespace API
                     ValidAudience = Configuration["Jwt:Issuer"],  
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))  
                 };  
-            });  
+            });
+            
+            services.AddAuthorization(x =>
+            {
+                x.AddPolicy("AtToken", Policy => Policy.Requirements.Add(new TokenPolicy()));
+            });
         }
 
         // Setup BLL and DLL Services
         private static void SetupAllDependency(IServiceCollection services)
         {
+            services.AddSingleton<IAuthorizationHandler, TokenPolicyHandler>();
             DllDependency.RegisterDllServices(services);
             BllDependency.RegisterBllServices(services);
             UtilityDependency.RegisterUtilityDependency(services);

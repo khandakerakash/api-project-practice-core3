@@ -33,14 +33,14 @@ namespace API.Controllers.V1
         }
 
         [HttpPost(ApiRoutes.Student.Create)]
-        [Authorize(Roles = "teacher")]
+        [Authorize(Roles = "teacher, staff", Policy = "AtToken")]
         public async Task<IActionResult> Create(StudentCreateRequest request)
         {
             return Ok(await _studentService.CreateAsync(request));
         }
 
         [HttpPut(ApiRoutes.Student.Update)]
-        [Authorize(Roles = "staff")]
+        [Authorize(Roles = "staff, teacher", Policy = "AtToken")]
         public async Task<IActionResult> Update(long id, StudentUpdateRequest request)
         {
             return Ok(await _studentService.UpdateAsync(id, request));

@@ -33,7 +33,7 @@ namespace API.Controllers.V1
         }
 
         [HttpPost(ApiRoutes.Department.Create)]
-        [Authorize(Roles = "staff")]
+        [Authorize(Roles = "staff", Policy = "AtToken")]
         public async Task<IActionResult> Create(DepartmentCreateRequest request)
         {
             return Ok(await _departmentService.CreateAsync(request));
