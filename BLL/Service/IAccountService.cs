@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
@@ -12,6 +13,7 @@ using DLL.UnitOfWorks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Utility.Exceptions;
 using Utility.Helpers;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
@@ -20,7 +22,7 @@ namespace BLL.Service
 {
     public interface IAccountService
     {
-        Task<string> Login(LoginRequest request);
+        Task<LoginResponse> Login(LoginRequest request);
         Task Test(ClaimsPrincipal cp);
     }
 
@@ -29,15 +31,17 @@ namespace BLL.Service
         private readonly UserManager<AppUser> _userManager;
         private readonly IConfiguration _config;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly TaposRSA _taposRsa;
 
-        public AccountService(UserManager<AppUser> userManager, IConfiguration config, IUnitOfWork unitOfWork)
+        public AccountService(UserManager<AppUser> userManager, IConfiguration config, IUnitOfWork unitOfWork, TaposRSA taposRsa)
         {
             _userManager = userManager;
             _config = config;
             _unitOfWork = unitOfWork;
+            _taposRsa = taposRsa;
         }
 
-        public async Task<string> Login(LoginRequest request)
+        public async Task<LoginResponse> Login(LoginRequest request)
         {
             var user = await _userManager.FindByNameAsync(request.UserName);
             if(user == null)
@@ -71,8 +75,9 @@ namespace BLL.Service
             throw new MyAppException("Something Went Wrong!");
         }
 
-        private async Task<string> GenerateJsonWebToken(AppUser userInfo)
+        private async Task<LoginResponse> GenerateJsonWebToken(AppUser userInfo)
         {
+            var response = new LoginResponse();
             var userRole = (await _userManager.GetRolesAsync(userInfo)).FirstOrDefault();
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));  
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -84,13 +89,25 @@ namespace BLL.Service
                 new Claim(CustomJwtClaimNames.Email, userInfo.Email ?? ""),
                 new Claim(ClaimTypes.Role, userRole)
             };
+            var times = _config.GetValue<int>("Jwt:AccessTokenLifeTime");
+            
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],  
                 _config["Jwt:Issuer"],  
                 claims,  
-                expires: DateTime.Now.AddMinutes(10),  
+                expires: DateTime.Now.AddMinutes(times),  
                 signingCredentials: credentials);  
-  
-            return new JwtSecurityTokenHandler().WriteToken(token);  
+            
+            var refreshToken = new RefreshTokenResponse()
+            {
+                UserId = userInfo.Id,
+                Id = Guid.NewGuid().ToString()
+            };
+            var rsaData = _taposRsa.EncryptData(JsonConvert.SerializeObject(refreshToken), "v1");
+            
+            response.Token = new JwtSecurityTokenHandler().WriteToken(token);
+            response.Expired = times * 60;
+            response.RefreshToken = rsaData;
+            return response;
         }  
     }
 }

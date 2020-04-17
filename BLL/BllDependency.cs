@@ -9,6 +9,12 @@ namespace BLL
     {
         public static void RegisterBllServices(IServiceCollection services)
         {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost";
+                options.InstanceName = "PracticeApiDB";
+            });
+            
             services.AddTransient<ITestService, TestService>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IStudentService, StudentService>();
