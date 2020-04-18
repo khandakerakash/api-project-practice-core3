@@ -25,6 +25,7 @@ namespace BLL.Service
     {
         Task<LoginResponse> Login(LoginRequest request);
         Task Test(ClaimsPrincipal cp);
+        Task<ApiSuccessResponse> Logout(ClaimsPrincipal cp);
     }
 
     public class AccountService : IAccountService
@@ -76,6 +77,26 @@ namespace BLL.Service
             await _unitOfWork.AppSaveChangesAsync();
             
             throw new MyAppException("Something Went Wrong!");
+        }
+
+        public async Task<ApiSuccessResponse> Logout(ClaimsPrincipal cp)
+        {
+            var userId = cp.Claims.FirstOrDefault(x => x.Type == "userId");
+            
+            var accessTokenKey = userId + "_accesstoken";
+            var refreshTokenKey = userId + "_refreshtoken";
+            
+            await _cache.RemoveAsync(accessTokenKey);
+            await _cache.RemoveAsync(refreshTokenKey);
+            
+            // if (accessTokenKey != null || refreshTokenKey != null)
+            //     throw new MyAppException("Something went wrong");
+            
+            return new ApiSuccessResponse()
+            {
+                StatusCode = 200,
+                Message = "Logout is done successfully."
+            };
         }
 
         private async Task<LoginResponse> GenerateJsonWebToken(AppUser userInfo)

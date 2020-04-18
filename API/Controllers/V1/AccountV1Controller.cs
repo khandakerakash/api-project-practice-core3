@@ -25,6 +25,14 @@ namespace API.Controllers.V1
             return Ok(await _accountService.Login(request));
         }
 
+        [HttpPost(ApiRoutes.Account.Logout)]
+        [Authorize(Roles = "staff, teacher", Policy = "AtToken")]
+        public async Task<IActionResult> Logout()
+        {
+            var cp = User;
+            return Ok(await _accountService.Logout(cp));
+        }
+
         [HttpGet("test1")]
         public IActionResult Test1()
         {

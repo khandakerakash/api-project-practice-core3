@@ -17,7 +17,7 @@ namespace API.Policy
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, TokenPolicy requirement)
         {
-            var userId = context.User.Claims.FirstOrDefault(x => x.Type == "userId").Value;
+            var userId = context.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if(userId == null)
                 throw new UnauthorizedAccessException();
             

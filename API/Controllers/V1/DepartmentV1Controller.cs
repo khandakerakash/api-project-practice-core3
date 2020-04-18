@@ -19,7 +19,7 @@ namespace API.Controllers.V1
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize(Roles = "staff", Policy = "AtToken")]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _departmentService.FindAllAsync());
