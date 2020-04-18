@@ -25,6 +25,7 @@ namespace BLL.Service
         Task<LoginResponse> Login(LoginRequest request);
         Task Test(ClaimsPrincipal cp);
         Task<ApiSuccessResponse> Logout(ClaimsPrincipal cp);
+        Task<LoginResponse> RefreshToken(string refreshToken);
     }
 
     public class AccountService : IAccountService
@@ -96,6 +97,23 @@ namespace BLL.Service
                 StatusCode = 200,
                 Message = "Logout is done successfully."
             };
+        }
+
+        public async Task<LoginResponse> RefreshToken(string refreshToken)
+        {
+            var decryptRsa = _taposRsa.Decrypt(refreshToken, "v1");
+            if(decryptRsa == null)
+                throw new MyAppException("Refresh token is not found");
+
+            var refreshTokenObject = JsonConvert.DeserializeObject<RefreshTokenResponse>(decryptRsa);
+            var refreshTokenKey = refreshTokenObject.UserId + "_refreshtoken";
+            
+            var cashData = await _cache.GetStringAsync(refreshTokenKey);
+            if(cashData == null || cashData != refreshToken)
+                throw new MyAppException("Refresh token is not found");
+
+            var user = await _userManager.FindByIdAsync(refreshTokenObject.UserId.ToString());
+            return await GenerateJsonWebToken(user);
         }
 
         private async Task<LoginResponse> GenerateJsonWebToken(AppUser userInfo)

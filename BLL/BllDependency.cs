@@ -25,6 +25,7 @@ namespace BLL
 
         private static void AllValidationDependency(IServiceCollection services)
         {
+            services.AddTransient<IValidator<RefreshTokenRequest>, RefreshTokenRequestValidator>();
             services.AddTransient<IValidator<StudentCreateRequest>, StudentCreateRequestValidator>();
             services.AddTransient<IValidator<StudentUpdateRequest>, StudentUpdateRequestValidator>();
             services.AddTransient<IValidator<DepartmentCreateRequest>, DepartmentCreateRequestValidator>();

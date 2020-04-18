@@ -8,6 +8,7 @@
         {
             public const string Login = Base + "login";
             public const string Logout = Base + "logout";
+            public const string Refresh = Base + "refresh";
         }
         
         public static class Student
