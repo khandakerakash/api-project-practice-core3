@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using DLL.Model.Interfaces;
 using Microsoft.AspNetCore.Identity;
 

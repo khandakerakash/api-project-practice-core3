@@ -55,9 +55,9 @@ namespace API.Controllers.V1
 
         [HttpGet(ApiRoutes.Student.DepartmentWiseStudents)]
         [AllowAnonymous]
-        public async Task<IActionResult> FindDepartmentWiseStudentAsync(long DepartmentId)
+        public async Task<IActionResult> DepartmentWiseStudentListAsync(long departmentId)
         {
-            return Ok(await _studentService.FindDepartmentWiseStudentAsync(DepartmentId));
+            return Ok(await _studentService.DepartmentWiseStudentListAsync(departmentId));
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Service;
 using Microsoft.AspNetCore.Authorization;
