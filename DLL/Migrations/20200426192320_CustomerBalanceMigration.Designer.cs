@@ -4,14 +4,16 @@ using DLL.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DLL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200426192320_CustomerBalanceMigration")]
+    partial class CustomerBalanceMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,11 +172,6 @@ namespace DLL.Migrations
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.HasKey("CustomerBalanceId");
 
                     b.ToTable("CustomerBalances");
@@ -211,21 +208,6 @@ namespace DLL.Migrations
                     b.HasKey("DepartmentId");
 
                     b.ToTable("Departments");
-                });
-
-            modelBuilder.Entity("DLL.Model.Order", b =>
-                {
-                    b.Property<long>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("OrderId");
-
-                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("DLL.Model.Student", b =>

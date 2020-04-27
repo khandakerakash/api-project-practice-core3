@@ -27,6 +27,8 @@ namespace DLL.DbContext
 
         public DbSet<Student> Students { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<CustomerBalance> CustomerBalances { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +49,14 @@ namespace DLL.DbContext
                 .HasMany(c => c.Students)
                 .WithOne(e => e.Department)
                 .IsRequired();
+            
+            modelBuilder.Entity<CustomerBalance>()
+                .Property(c => c.Balance)
+                .HasColumnType("decimal(18,2)");
+            
+            modelBuilder.Entity<Order>()
+                .Property(o => o.Amount)
+                .HasColumnType("decimal(18,2)");
         }
         
         private const string IsDeletedProperty = "IsDeleted";

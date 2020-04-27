@@ -1,4 +1,5 @@
-﻿using BLL.Service;
+﻿using System.Threading.Tasks;
+using BLL.Service;
 using Microsoft.AspNetCore.Mvc;
 using Utility.Helpers;
 
@@ -24,11 +25,18 @@ namespace API.Controllers.V1
         //     return Ok("Hello, I'm from the test controller.");
         // }
 
+        // [HttpGet]
+        // public IActionResult Index()
+        // {
+        //     _taposRsa.GenerateRsaKey("v1");
+        //     return Ok("Hello, I'm RSA Key Tester.");
+        // }
+        
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            _taposRsa.GenerateRsaKey("v1");
-            return Ok("Hello, I'm RSA Key Tester.");
+            await _testService.UpdateCustomerBalanceTest();
+            return Ok("Hello, I'm 'UpdateCustomerBalanceTest' method from the TestController.");
         }
     }
 }

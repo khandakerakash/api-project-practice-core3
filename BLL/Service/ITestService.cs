@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using DLL.Model;
+using DLL.UnitOfWorks;
 using Microsoft.AspNetCore.Identity;
 
 namespace BLL.Service
@@ -7,15 +9,18 @@ namespace BLL.Service
     public interface ITestService
     {
         Task SaveTestData();
+        Task UpdateCustomerBalanceTest();
     }
 
     public class TestService : ITestService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<AppRole> _roleManager;
 
-        public TestService(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+        public TestService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
         {
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -44,6 +49,22 @@ namespace BLL.Service
             
                 await _userManager.AddToRoleAsync(user, "staff");
             }
+        }
+
+        public async Task UpdateCustomerBalanceTest()
+        {
+            Random rnd = new Random();
+            int myNumber = rnd.Next(1, 100);
+            
+            Order order = new Order()
+            {
+                Amount = myNumber
+            };
+
+            await _unitOfWork.OrderRepository.CreateAsync(order);
+            
+            if (await _unitOfWork.AppSaveChangesAsync())
+                await _unitOfWork.CustomerBalanceRepository.UpdateCustomerBalanceAsync(myNumber);
         }
     }
 }

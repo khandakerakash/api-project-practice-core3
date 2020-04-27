@@ -10,6 +10,8 @@ namespace DLL.UnitOfWorks
         // We have to added the all `Repository` here
         IStudentRepository StudentRepository { get; }
         IDepartmentRepository DepartmentRepository { get; }
+        ICustomerBalanceRepository CustomerBalanceRepository { get; }
+        IOrderRepository OrderRepository { get; }
         // All `Repository` End
         Task<bool> AppSaveChangesAsync();
         void Dispose();
@@ -22,6 +24,8 @@ namespace DLL.UnitOfWorks
 
         private IStudentRepository _studentRepository;
         private IDepartmentRepository _departmentRepository;
+        private ICustomerBalanceRepository _customerBalanceRepository;
+        private IOrderRepository _orderRepository;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -33,6 +37,12 @@ namespace DLL.UnitOfWorks
 
         public IDepartmentRepository DepartmentRepository =>
             _departmentRepository ??= new DepartmentRepository(_context);
+
+        public ICustomerBalanceRepository CustomerBalanceRepository =>
+            _customerBalanceRepository ??= new CustomerBalanceRepository(_context);
+
+        public IOrderRepository OrderRepository =>
+            _orderRepository ??= new OrderRepository(_context);
 
         public async Task<bool> AppSaveChangesAsync()
         {
