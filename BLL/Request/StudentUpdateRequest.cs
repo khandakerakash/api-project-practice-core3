@@ -1,4 +1,9 @@
-﻿using FluentValidation;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using BLL.Service;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BLL.Request
 {
@@ -12,12 +17,26 @@ namespace BLL.Request
 
     public class StudentUpdateRequestValidator : AbstractValidator<StudentUpdateRequest>
     {
-        public StudentUpdateRequestValidator()
+        private readonly IServiceProvider _serviceProvider;
+
+        public StudentUpdateRequestValidator(IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
             RuleFor(x => x.Name).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25);
             RuleFor(x => x.Email).NotNull().NotEmpty().MinimumLength(10).MaximumLength(25).EmailAddress();
             RuleFor(x => x.RollNo).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25);
-            RuleFor(x => x.DepartmentId).NotNull().NotEmpty();
+            RuleFor(x => x.DepartmentId).NotNull().NotEmpty()
+                .MustAsync(DepartmentIdExists).WithMessage("The given department Id doesn't exist in our system.");
+        }
+
+        private async Task<bool> DepartmentIdExists(long departmentId, CancellationToken token)
+        {
+            if (departmentId == 0)
+            {
+                return true;
+            }
+            var studentService = _serviceProvider.GetRequiredService<IStudentService>();
+            return await studentService.IsDepartmentIdExistsAsync(departmentId);
         }
     }
 }
