@@ -52,12 +52,5 @@ namespace API.Controllers.V1
         {
             return Ok(await _studentService.DeleteAsync(id));
         }
-
-        [HttpGet(ApiRoutes.Student.DepartmentWiseStudents)]
-        [AllowAnonymous]
-        public async Task<IActionResult> DepartmentWiseStudentListAsync(long departmentId)
-        {
-            return Ok(await _studentService.DepartmentWiseStudentListAsync(departmentId));
-        }
     }
 }

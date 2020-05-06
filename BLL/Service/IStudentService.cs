@@ -4,6 +4,7 @@ using BLL.Request;
 using BLL.Response;
 using DLL.Model;
 using DLL.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 using Utility.Exceptions;
 
 namespace BLL.Service
@@ -15,7 +16,7 @@ namespace BLL.Service
         Task<ApiSuccessResponse> CreateAsync(StudentCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, StudentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
-        Task<Student> DepartmentWiseStudentListAsync(long departmentId);
+        Task<List<StudentReportResponse>> StudentDepartmentInfoListAsync();
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsRollNoExistsAsync(string rollNo);
         Task<bool> IsDepartmentIdExistsAsync(long departmentId);
@@ -116,13 +117,27 @@ namespace BLL.Service
             throw new MyAppException("Something went wrong!");
         }
 
-        public async Task<Student> DepartmentWiseStudentListAsync(long departmentId)
+        public async Task<List<StudentReportResponse>> StudentDepartmentInfoListAsync()
         {
-            var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.DepartmentId == departmentId);
-            //var student = await _unitOfWork.StudentRepository.FindAllAsync(x => x.DepartmentId == DepartmentId);
-            if(student == null)
-                throw new MyAppException("The student with a given department id is not found!");
-            return student;
+            var students = await _unitOfWork.StudentRepository.QueryAll().Include(x => x.Department).ToListAsync();
+            
+            var result = new List<StudentReportResponse>();
+            
+            foreach (var student in students)
+            {
+                result.Add(new StudentReportResponse()
+                {
+                    Name = student.Name,
+                    Email = student.Email,
+                    RollNo = student.RollNo,
+                    DepartmentCode = student.Department.Code,
+                    DepartmentName = student.Department.Name
+                });
+            }
+
+            if(result == null)
+                throw new MyAppException("The student with department info. is not found!");
+            return result;
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
