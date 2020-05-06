@@ -10,10 +10,10 @@ namespace DLL.Model
         public string Email { get; set; }
         public string RollNo { get; set; }
         public long DepartmentId { get; set; }
+        public Department Department { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public string CreatedBy { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public string UpdatedBy { get; set; }
-        public Department Department { get; set; }
     }
 }

@@ -44,12 +44,7 @@ namespace DLL.DbContext
                 }
             }
             base.OnModelCreating(modelBuilder);
-            
-            modelBuilder.Entity<Department>()
-                .HasMany(c => c.Students)
-                .WithOne(e => e.Department)
-                .IsRequired();
-            
+
             modelBuilder.Entity<CustomerBalance>()
                 .Property(c => c.Balance)
                 .HasColumnType("decimal(18,2)");
