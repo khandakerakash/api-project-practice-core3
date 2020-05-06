@@ -25,7 +25,8 @@ namespace BLL.Request
                 .MustAsync(EmailIsExists).WithMessage("The student with a given email already exists in our system.");
             RuleFor(x => x.RollNo).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25)
                 .MustAsync(RollNoIsExists).WithMessage("The student with a given roll no already exists in our system");
-            RuleFor(x => x.DepartmentId).NotNull().NotEmpty();
+            RuleFor(x => x.DepartmentId).NotNull().NotEmpty()
+                .MustAsync(DepartmentIdExists).WithMessage("The given department Id doesn't exist in our system.");
         }
         
         private async Task<bool> EmailIsExists(string email, CancellationToken token)
@@ -46,6 +47,16 @@ namespace BLL.Request
             }
             var studentService = _serviceProvider.GetRequiredService<IStudentService>();
             return await studentService.IsRollNoExistsAsync(rollNo);
+        }
+
+        private async Task<bool> DepartmentIdExists(long departmentId, CancellationToken token)
+        {
+            if (departmentId == 0)
+            {
+                return true;
+            }
+            var studentService = _serviceProvider.GetRequiredService<IStudentService>();
+            return await studentService.IsDepartmentIdExistsAsync(departmentId);
         }
     }
 }

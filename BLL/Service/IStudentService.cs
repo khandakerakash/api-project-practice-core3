@@ -18,6 +18,7 @@ namespace BLL.Service
         Task<Student> DepartmentWiseStudentListAsync(long departmentId);
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsRollNoExistsAsync(string rollNo);
+        Task<bool> IsDepartmentIdExistsAsync(long departmentId);
     }
 
     public class StudentService : IStudentService
@@ -134,6 +135,12 @@ namespace BLL.Service
         {
             var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.RollNo == rollNo);
             return student == null ? true : false;
+        }
+
+        public async Task<bool> IsDepartmentIdExistsAsync(long departmentId)
+        {
+            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.DepartmentId == departmentId);
+            return department != null ? true : false;
         }
     }
 }

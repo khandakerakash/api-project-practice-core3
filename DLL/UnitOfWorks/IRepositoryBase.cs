@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DLL.DbContext;
@@ -14,13 +15,14 @@ namespace DLL.UnitOfWorks
         Task CreateAsync(T entity);
         Task<T> FindSingleAsync(Expression<Func<T, bool>> expression);
         Task<List<T>> FindAllAsync(Expression<Func<T, bool>> expression = null);
+        IQueryable<T> QueryAll(Expression<Func<T, bool>> expression = null);
     }
 
-    public class RepositoryBase<T> : IRepositoryBase<T> where T : class
+    public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
     {
         private readonly ApplicationDbContext _context;
 
-        public RepositoryBase(ApplicationDbContext context)
+        protected RepositoryBase(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -42,15 +44,21 @@ namespace DLL.UnitOfWorks
         
         public async Task<T> FindSingleAsync(Expression<Func<T, bool>> expression)
         {
-            return await _context.Set<T>().FirstOrDefaultAsync(expression);
+            return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(expression);
         }
         
         public async Task<List<T>> FindAllAsync(Expression<Func<T, bool>> expression)
         {
-            if (expression != null)
-                return await _context.Set<T>().ToListAsync();
-
-            return await _context.Set<T>().ToListAsync();
+            return expression != null
+                ? await _context.Set<T>().Where(expression).AsNoTracking().ToListAsync()
+                : await _context.Set<T>().AsNoTracking().ToListAsync();
+        }
+        
+        public IQueryable<T> QueryAll(Expression<Func<T, bool>> expression)
+        {
+            return expression != null
+                ? _context.Set<T>().AsQueryable().Where(expression).AsNoTracking()
+                : _context.Set<T>().AsQueryable().AsNoTracking();
         }
     }
 }
