@@ -1,6 +1,6 @@
 ## `RESTful API` developemnt using  [ASP.NET Core 3.1](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-3.1)
 
-### Here, I have created a simple `ProjectPractice` demo application for `RESTful API` practice purpose.<Enter>
+### Here, I've created a simple `ProjectPractice` demo application for `RESTful API` practice purpose.<Enter>
 
 **`Application Features`**
 
