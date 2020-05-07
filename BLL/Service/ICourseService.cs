@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
@@ -14,10 +13,9 @@ namespace BLL.Service
         Task<IEnumerable<Course>> FindAllAsync();
         Task<Course> FindSingleAsync(long id);
         Task<ApiSuccessResponse> CreateAsync(CourseCreateRequest request);
-        Task<ApiSuccessResponse> UpdateAsync(long id, CourseCreateRequest request);
+        Task<ApiSuccessResponse> UpdateAsync(long id, CourseUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
         Task<bool> IsCourseCodeExistsAsync(string code);
-        Task<bool> IsCourseNameExistsAsync(string name);
         Task<bool> IsStudentIdExistsAsync(long studentId);
     }
 
@@ -67,9 +65,29 @@ namespace BLL.Service
             throw new MyAppException("Something went wrong!");
         }
 
-        public async Task<ApiSuccessResponse> UpdateAsync(long id, CourseCreateRequest request)
+        public async Task<ApiSuccessResponse> UpdateAsync(long id, CourseUpdateRequest request)
         {
-            throw new System.NotImplementedException();
+            var course = await _unitOfWork.CourseRepository.FindSingleAsync(x => x.CourseId == id);
+            if (course == null)
+                throw new MyAppException("The course with a given id is not found!");
+
+            var courseCodeExistsAsync =
+                await _unitOfWork.CourseRepository.FindSingleAsync(x => x.Code == request.Code && x.Code != course.Code);
+            if (courseCodeExistsAsync != null)
+                throw new MyAppException("The course with a given email already exists in our system!");
+
+            course.Code = request.Code;
+            course.Name = request.Name;
+
+            _unitOfWork.CourseRepository.Update(course);
+            if (await _unitOfWork.AppSaveChangesAsync())
+                return new ApiSuccessResponse()
+                {
+                    StatusCode = 200,
+                    Message = "The student has been successfully updated."
+                };
+            
+            throw new MyAppException("Something went wrong!");
         }
 
         public async Task<ApiSuccessResponse> DeleteAsync(long id)
@@ -92,12 +110,6 @@ namespace BLL.Service
         public async Task<bool> IsCourseCodeExistsAsync(string code)
         {
             var course = await _unitOfWork.CourseRepository.FindSingleAsync(x => x.Code == code);
-            return course == null ? true : false;
-        }
-
-        public async Task<bool> IsCourseNameExistsAsync(string name)
-        {
-            var course = await _unitOfWork.CourseRepository.FindSingleAsync(x => x.Name == name);
             return course == null ? true : false;
         }
 

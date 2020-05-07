@@ -38,5 +38,19 @@ namespace API.Controllers.V1
         {
             return Ok(await _courseService.CreateAsync(request));
         }
+        
+        [HttpPut(ApiRoutes.Course.Update)]
+        [Authorize(Roles = "teacher, staff", Policy = "AtToken")]
+        public async Task<IActionResult> Update(long id, CourseUpdateRequest request)
+        {
+            return Ok(await _courseService.UpdateAsync(id, request));
+        }
+        
+        [HttpDelete(ApiRoutes.Course.Delete)]
+        [Authorize(Roles = "teacher, staff", Policy = "AtToken")]
+        public async Task<IActionResult> Delete(long id)
+        {
+            return Ok(await _courseService.DeleteAsync(id));
+        }
     }
 }
