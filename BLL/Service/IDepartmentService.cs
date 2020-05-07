@@ -17,6 +17,7 @@ namespace BLL.Service
         Task<ApiSuccessResponse> CreateAsync(DepartmentCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, DepartmentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
+        Task<List<DepartmentReportResponse>> DepartmentWiseStudentListAsync();
         Task<bool> IsNameExistsAsync(string name);
         Task<bool> IsCodeExistsAsync(string code);
     }
@@ -112,6 +113,28 @@ namespace BLL.Service
                 };
             
             throw new MyAppException("Something went wrong!");
+        }
+
+        public async Task<List<DepartmentReportResponse>> DepartmentWiseStudentListAsync()
+        {
+            var departments = await _unitOfWork.DepartmentRepository.QueryAll().Include(x => x.Students).ToListAsync();
+
+            var result = new List<DepartmentReportResponse>();
+            
+            foreach (var department in departments)
+            {
+                result.Add(new DepartmentReportResponse()
+                {
+                    Code = department.Code,
+                    Name = department.Name,
+                    Students = department.Students
+                });
+            }
+
+            
+            if (result == null)
+                throw new MyAppException("The department list is not found!");
+            return result;
         }
 
         public async Task<bool> IsNameExistsAsync(string name)

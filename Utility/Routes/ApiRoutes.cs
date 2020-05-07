@@ -21,7 +21,7 @@
         
         public static class StudentReport
         {
-            public const string StudentDepartmentInfo = Base + "student-with-department-info";
+            public const string StudentDepartmentInfo = Base + "student-list-with-department-info";
         }
         
         public static class Department
@@ -30,7 +30,11 @@
             public const string Create = Base + "";
             public const string Update = Base + "{id}";
             public const string Delete = Base + "{id}";
-            public const string DepartmentWiseStudentInfo = Base + "department-wise-student-info";
+        }
+        
+        public static class DepartmentReport
+        {
+            public const string DepartmentWiseStudentList = Base + "department-wise-student-list";
         }
         
         public static class Course
