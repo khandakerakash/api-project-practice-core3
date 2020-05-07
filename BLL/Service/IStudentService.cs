@@ -34,7 +34,10 @@ namespace BLL.Service
 
         public async Task<IEnumerable<Student>> FindAllAsync()
         {
-            return await _unitOfWork.StudentRepository.FindAllAsync();
+            var student = await _unitOfWork.StudentRepository.FindAllAsync();
+            if (student == null)
+                throw new MyAppException("The student list is not found!");
+            return student;
         }
 
         public async Task<Student> FindSingleAsync(long id)
@@ -61,7 +64,7 @@ namespace BLL.Service
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
-                    Message = "The Student has been Successfully Created."
+                    Message = "The student has been successfully created."
                 };
             }
             
@@ -94,7 +97,7 @@ namespace BLL.Service
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
-                    Message = "The Student has been successfully updated."
+                    Message = "The student has been successfully updated."
                 };
             
             throw new MyAppException("Something went wrong!");
@@ -111,7 +114,7 @@ namespace BLL.Service
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
-                    Message = "The Student has been successfully deleted."
+                    Message = "The student has been successfully deleted."
                 };
             
             throw new MyAppException("Something went wrong!");

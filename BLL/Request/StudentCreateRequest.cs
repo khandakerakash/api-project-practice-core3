@@ -16,8 +16,10 @@ namespace BLL.Request
     }
     
     public class StudentCreateRequestValidator : AbstractValidator<StudentCreateRequest> {
+        
         private readonly IServiceProvider _serviceProvider;
-        public StudentCreateRequestValidator(IServiceProvider serviceProvider) {
+        public StudentCreateRequestValidator(IServiceProvider serviceProvider) 
+        {
             _serviceProvider = serviceProvider;
 
             RuleFor(x => x.Name).NotNull().NotEmpty().MinimumLength(5).MaximumLength(25);

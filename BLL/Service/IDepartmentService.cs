@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
 using DLL.Model;
 using DLL.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 using Utility.Exceptions;
 
 namespace BLL.Service
@@ -30,7 +32,10 @@ namespace BLL.Service
 
         public async Task<IEnumerable<Department>> FindAllAsync()
         {
-            return await _unitOfWork.DepartmentRepository.FindAllAsync();
+            var department = await _unitOfWork.DepartmentRepository.FindAllAsync();
+            if (department == null)
+                throw new MyAppException("The department list is not found!");
+            return department;
         }
 
         public async Task<Department> FindSingleAsync(long id)
@@ -55,7 +60,7 @@ namespace BLL.Service
                 return new ApiSuccessResponse()
                 {
                     StatusCode = 200,
-                    Message = "Department has been created successfully."
+                    Message = "The department has been created successfully."
                 };
             
             throw new MyAppException("Something went wrong!");
@@ -65,7 +70,7 @@ namespace BLL.Service
         {
             var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.DepartmentId == id);
             if (department == null)
-                throw new MyAppException("The department not found!");
+                throw new MyAppException("The department is not found!");
             
             var departmentNameAlreadyExists =
                 await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.Name == request.Name && x.Name != department.Name);
@@ -96,7 +101,7 @@ namespace BLL.Service
             var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.DepartmentId == id);
 
             if (department == null)
-                throw new MyAppException("The department not found!");
+                throw new MyAppException("The department is not found!");
             
             _unitOfWork.DepartmentRepository.Delete(department);
             if (await _unitOfWork.AppSaveChangesAsync())

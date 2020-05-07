@@ -10,6 +10,7 @@ namespace DLL.UnitOfWorks
         // We have to added the all `Repository` here
         IStudentRepository StudentRepository { get; }
         IDepartmentRepository DepartmentRepository { get; }
+        ICourseRepository CourseRepository { get; }
         ICustomerBalanceRepository CustomerBalanceRepository { get; }
         IOrderRepository OrderRepository { get; }
         // All `Repository` End
@@ -24,6 +25,7 @@ namespace DLL.UnitOfWorks
 
         private IStudentRepository _studentRepository;
         private IDepartmentRepository _departmentRepository;
+        private ICourseRepository _courseRepository;
         private ICustomerBalanceRepository _customerBalanceRepository;
         private IOrderRepository _orderRepository;
 
@@ -37,6 +39,9 @@ namespace DLL.UnitOfWorks
 
         public IDepartmentRepository DepartmentRepository =>
             _departmentRepository ??= new DepartmentRepository(_context);
+
+        public ICourseRepository CourseRepository =>
+            _courseRepository ??= new CourseRepository(_context);
 
         public ICustomerBalanceRepository CustomerBalanceRepository =>
             _customerBalanceRepository ??= new CustomerBalanceRepository(_context);
