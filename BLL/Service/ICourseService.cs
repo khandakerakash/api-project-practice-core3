@@ -4,6 +4,7 @@ using BLL.Request;
 using BLL.Response;
 using DLL.Model;
 using DLL.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 using Utility.Exceptions;
 
 namespace BLL.Service
@@ -15,6 +16,7 @@ namespace BLL.Service
         Task<ApiSuccessResponse> CreateAsync(CourseCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, CourseUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
+        Task<List<CourseStudentReportResponse>> CourseStudentListAsync();
         Task<bool> IsCourseCodeExistsAsync(string code);
         Task<bool> IsStudentIdExistsAsync(long studentId);
     }
@@ -105,6 +107,29 @@ namespace BLL.Service
                 };
             
             throw new MyAppException("Something went wrong!");
+        }
+        
+        public async Task<List<CourseStudentReportResponse>> CourseStudentListAsync()
+        {
+            var courseEnrolledStudents =
+                await _unitOfWork.CourseRepository.QueryAll().Include(x => x.CourseStudents).ThenInclude(x => x.Student)
+                    .ToListAsync();
+            
+            var result = new List<CourseStudentReportResponse>();
+
+            foreach (var courseEnrolledStudent in courseEnrolledStudents)
+            {
+                result.Add(new CourseStudentReportResponse()
+                {
+                    CourseCode = courseEnrolledStudent.Code,
+                    CourseName = courseEnrolledStudent.Name,
+                    CourseStudents = courseEnrolledStudent.CourseStudents
+                });
+            }
+            
+            if(result == null)
+                throw new MyAppException("The course enrolled students info. is not found!");
+            return result;
         }
 
         public async Task<bool> IsCourseCodeExistsAsync(string code)

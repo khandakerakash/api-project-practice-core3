@@ -22,6 +22,7 @@
         public static class StudentReport
         {
             public const string StudentDepartmentInfo = Base + "student-list-with-department-info";
+            public const string StudentCourseInfo = Base + "student-list-with-course-info";
         }
         
         public static class Department
@@ -38,6 +39,19 @@
         }
         
         public static class Course
+        {
+            public const string GetOne = Base + "{id}";
+            public const string Create = Base + "";
+            public const string Update = Base + "{id}";
+            public const string Delete = Base + "{id}";
+        }
+        
+        public static class CourseReport
+        {
+            public const string CourseStudentList = Base + "course-list-with-student-info";
+        }
+        
+        public static class CourseEnroll
         {
             public const string GetOne = Base + "{id}";
             public const string Create = Base + "";

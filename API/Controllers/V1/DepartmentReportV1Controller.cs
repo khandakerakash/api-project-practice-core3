@@ -8,7 +8,7 @@ namespace API.Controllers.V1
 {
     [ApiVersion("1.0")]
     [Route("api/v{v:apiVersion}/department-report")]
-    public class DepartmentReportV1Controller : Controller
+    public class DepartmentReportV1Controller : RootController
     {
         private readonly IDepartmentService _departmentService;
 

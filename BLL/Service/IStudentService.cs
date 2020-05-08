@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using BLL.Request;
 using BLL.Response;
@@ -17,6 +19,7 @@ namespace BLL.Service
         Task<ApiSuccessResponse> UpdateAsync(long id, StudentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
         Task<List<StudentReportResponse>> StudentDepartmentInfoListAsync();
+        Task<List<StudentCourseReportResponse>> StudentCourseEnrolledInfoListAsync();
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsRollNoExistsAsync(string rollNo);
         Task<bool> IsDepartmentIdExistsAsync(long departmentId);
@@ -140,6 +143,30 @@ namespace BLL.Service
 
             if(result == null)
                 throw new MyAppException("The student with department info. is not found!");
+            return result;
+        }
+
+        public async Task<List<StudentCourseReportResponse>> StudentCourseEnrolledInfoListAsync()
+        {
+            var studentCourses =
+                await _unitOfWork.StudentRepository.QueryAll().Include(x => x.CourseStudents).ThenInclude(x => x.Course)
+                    .ToListAsync();
+
+            var result = new List<StudentCourseReportResponse>();
+
+            foreach (var studentCourse in studentCourses)
+            {
+                result.Add(new StudentCourseReportResponse()
+                {
+                    Name = studentCourse.Name,
+                    Email = studentCourse.Email,
+                    RollNo = studentCourse.RollNo,
+                    CourseStudents = studentCourse.CourseStudents
+                });
+            }
+            
+            if(result == null)
+                throw new MyAppException("The student with enrolled course info. is not found!");
             return result;
         }
 

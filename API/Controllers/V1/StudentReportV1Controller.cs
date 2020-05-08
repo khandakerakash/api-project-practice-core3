@@ -23,5 +23,12 @@ namespace API.Controllers.V1
         {
             return Ok(await _studentService.StudentDepartmentInfoListAsync());
         }
+        
+        [HttpGet(ApiRoutes.StudentReport.StudentCourseInfo)]
+        [AllowAnonymous]
+        public async Task<IActionResult> StudentCourseEnrolledInfoListAsync()
+        {
+            return Ok(await _studentService.StudentCourseEnrolledInfoListAsync());
+        }
     }
 }

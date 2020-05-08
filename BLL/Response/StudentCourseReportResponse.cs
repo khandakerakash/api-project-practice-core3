@@ -3,12 +3,11 @@ using DLL.Model;
 
 namespace BLL.Response
 {
-    public class StudentReportResponse
+    public class StudentCourseReportResponse
     {
         public string Name { get; set; }
         public string Email { get; set; }
         public string RollNo { get; set; }
-        public string DepartmentCode { get; set; }
-        public string DepartmentName { get; set; }
+        public ICollection<CourseStudent> CourseStudents { get; set; }
     }
 }
