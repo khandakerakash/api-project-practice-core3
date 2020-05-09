@@ -16,8 +16,6 @@ namespace BLL.Service
         Task<ApiSuccessResponse> CreateAsync(CourseEnrollCreateRequest request);
         Task<ApiSuccessResponse> UpdateAsync(long id, CourseEnrollUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
-        Task<bool> IsCourseCodeExistsAsync(long courseId);
-        Task<bool> IsStudentIdExistsAsync(long studentId);
     }
 
     public class CourseEnrollService : ICourseEnrollService
@@ -50,6 +48,14 @@ namespace BLL.Service
                 StudentId = request.StudentId
             };
 
+            var alreadyCourseEnrollOrNot = await _unitOfWork.CourseEnrollRepository.FindSingleAsync(x =>
+                x.CourseId == request.CourseId && x.StudentId == request.StudentId);
+
+            if (alreadyCourseEnrollOrNot != null)
+            {
+                throw new MyAppException("The given student id already enrolled by this course.");
+            }
+
             await _unitOfWork.CourseEnrollRepository.CreateAsync(courseEnroll);
             if (await _unitOfWork.AppSaveChangesAsync())
             {
@@ -71,18 +77,6 @@ namespace BLL.Service
         public Task<ApiSuccessResponse> DeleteAsync(long id)
         {
             throw new System.NotImplementedException();
-        }
-
-        public async Task<bool> IsCourseCodeExistsAsync(long courseId)
-        {
-            var course = await _unitOfWork.CourseRepository.FindSingleAsync(x => x.CourseId == courseId);
-            return course != null ? true : false;
-        }
-
-        public async Task<bool> IsStudentIdExistsAsync(long studentId)
-        {
-            var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.StudentId == studentId);
-            return student != null ? true : false;
         }
     }
 }

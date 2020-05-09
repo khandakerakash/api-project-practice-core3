@@ -57,8 +57,8 @@ namespace BLL.Request
             {
                 return true;
             }
-            var studentService = _serviceProvider.GetRequiredService<IStudentService>();
-            return await studentService.IsDepartmentIdExistsAsync(departmentId);
+            var departmentService = _serviceProvider.GetRequiredService<IDepartmentService>();
+            return await departmentService.IsDepartmentIdExistsAsync(departmentId);
         }
     }
 }

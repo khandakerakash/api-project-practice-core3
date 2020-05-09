@@ -18,6 +18,7 @@ namespace BLL.Service
         Task<ApiSuccessResponse> UpdateAsync(long id, DepartmentUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
         Task<List<DepartmentReportResponse>> DepartmentWiseStudentListAsync();
+        Task<bool> IsDepartmentIdExistsAsync(long departmentId);
         Task<bool> IsNameExistsAsync(string name);
         Task<bool> IsCodeExistsAsync(string code);
     }
@@ -135,6 +136,12 @@ namespace BLL.Service
             if (result == null)
                 throw new MyAppException("The department list is not found!");
             return result;
+        }
+
+        public async Task<bool> IsDepartmentIdExistsAsync(long departmentId)
+        {
+            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.DepartmentId == departmentId);
+            return department != null ? true : false;
         }
 
         public async Task<bool> IsNameExistsAsync(string name)

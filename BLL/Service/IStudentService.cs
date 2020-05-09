@@ -20,9 +20,9 @@ namespace BLL.Service
         Task<ApiSuccessResponse> DeleteAsync(long id);
         Task<List<StudentReportResponse>> StudentDepartmentInfoListAsync();
         Task<List<StudentCourseReportResponse>> StudentCourseEnrolledInfoListAsync();
+        Task<bool> IsStudentIdExistsAsync(long studentId);
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsRollNoExistsAsync(string rollNo);
-        Task<bool> IsDepartmentIdExistsAsync(long departmentId);
     }
 
     public class StudentService : IStudentService
@@ -149,7 +149,9 @@ namespace BLL.Service
         public async Task<List<StudentCourseReportResponse>> StudentCourseEnrolledInfoListAsync()
         {
             var studentCourses =
-                await _unitOfWork.StudentRepository.QueryAll().Include(x => x.CourseStudents).ThenInclude(x => x.Course)
+                await _unitOfWork.StudentRepository.QueryAll()
+                    .Include(x => x.CourseStudents)
+                    .ThenInclude(x => x.Course)
                     .ToListAsync();
 
             var result = new List<StudentCourseReportResponse>();
@@ -161,13 +163,19 @@ namespace BLL.Service
                     Name = studentCourse.Name,
                     Email = studentCourse.Email,
                     RollNo = studentCourse.RollNo,
-                    CourseStudents = studentCourse.CourseStudents
+                    CourseStudents = studentCourse.CourseStudents.ToList()
                 });
             }
             
             if(result == null)
                 throw new MyAppException("The student with enrolled course info. is not found!");
             return result;
+        }
+
+        public async Task<bool> IsStudentIdExistsAsync(long studentId)
+        {
+            var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.StudentId == studentId);
+            return student != null ? true : false;
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
@@ -180,12 +188,6 @@ namespace BLL.Service
         {
             var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.RollNo == rollNo);
             return student == null ? true : false;
-        }
-
-        public async Task<bool> IsDepartmentIdExistsAsync(long departmentId)
-        {
-            var department = await _unitOfWork.DepartmentRepository.FindSingleAsync(x => x.DepartmentId == departmentId);
-            return department != null ? true : false;
         }
     }
 }

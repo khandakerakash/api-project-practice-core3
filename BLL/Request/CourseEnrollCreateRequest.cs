@@ -33,8 +33,8 @@ namespace BLL.Request
             {
                 return true;
             }
-            var courseEnrollService = _serviceProvider.GetRequiredService<ICourseEnrollService>();
-            return await courseEnrollService.IsCourseCodeExistsAsync(courseId);
+            var courseService = _serviceProvider.GetRequiredService<ICourseService>();
+            return await courseService.IsCourseIdExistsAsync(courseId);
         }
 
         private async Task<bool> StudentIdExists(long studentId, CancellationToken token)
@@ -43,8 +43,8 @@ namespace BLL.Request
             {
                 return true;
             }
-            var courseEnrollService = _serviceProvider.GetRequiredService<ICourseEnrollService>();
-            return await courseEnrollService.IsStudentIdExistsAsync(studentId);
+            var studentService = _serviceProvider.GetRequiredService<IStudentService>();
+            return await studentService.IsStudentIdExistsAsync(studentId);
         }
     }
 }

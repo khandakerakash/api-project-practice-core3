@@ -17,8 +17,8 @@ namespace BLL.Service
         Task<ApiSuccessResponse> UpdateAsync(long id, CourseUpdateRequest request);
         Task<ApiSuccessResponse> DeleteAsync(long id);
         Task<List<CourseStudentReportResponse>> CourseStudentListAsync();
+        Task<bool> IsCourseIdExistsAsync(long courseId);
         Task<bool> IsCourseCodeExistsAsync(string code);
-        Task<bool> IsStudentIdExistsAsync(long studentId);
     }
 
     public class CourseService : ICourseService
@@ -132,16 +132,16 @@ namespace BLL.Service
             return result;
         }
 
+        public async Task<bool> IsCourseIdExistsAsync(long courseId)
+        {
+            var course = await _unitOfWork.CourseRepository.FindSingleAsync(x => x.CourseId == courseId);
+            return course != null ? true : false;
+        }
+
         public async Task<bool> IsCourseCodeExistsAsync(string code)
         {
             var course = await _unitOfWork.CourseRepository.FindSingleAsync(x => x.Code == code);
             return course == null ? true : false;
-        }
-
-        public async Task<bool> IsStudentIdExistsAsync(long studentId)
-        {
-            var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.StudentId == studentId);
-            return student != null ? true : false;
         }
     }
 }
