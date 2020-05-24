@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DLL.Model;
+using DLL.MongoReport.Model;
+using DLL.MongoReport.Repository;
 using DLL.UnitOfWorks;
 using Microsoft.AspNetCore.Identity;
 
